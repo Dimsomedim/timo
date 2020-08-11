@@ -1,5 +1,6 @@
 let interval;
 let isCounting;
+let startTime = 0;
 let timer = 0;
 
 const checkbox = document.querySelector("#checkbox");
@@ -15,34 +16,31 @@ const initTimer = function (){
 
     if (prevState && prevState === 'true'){
         checkbox.checked = true;
-        timer = getTime() - prevTime;
-        setStopwatch(timer);
+        startTime = prevTime;
+        setStopwatch(startTime);
         startStop();
-        console.log("asdasd");
 
     } else if (prevState && prevState === 'false'){
         timer = parseInt(sessionStorage.getItem('timer'));
-        setStopwatch(timer);
+        startTime = getTime() - timer;
+        setStopwatch(startTime);
         checkbox.checked = false;
         isCounting = false;
     }
     
 }
 
-const countTime = function(){
-    timer++;
-    setStopwatch(timer);
-}
+const setStopwatch = function(){
 
-const setStopwatch = function(timer){
+    timer = getTime() - startTime;
 
     let hours = Math.floor(timer / 3600);
-    let minutes = Math.floor(timer / 60);
-    let seconds = timer - minutes * 60;
+    let minutes = Math.floor((timer / 60) - hours * 60);
+    let seconds = Math.floor(timer - minutes * 60 - hours * 3600);
 
-let displaySeconds = 0;
-let displayMinutes = 0;
-let displayHours = 0;
+    let displaySeconds = 0;
+    let displayMinutes = 0;
+    let displayHours = 0;
 
     if(seconds < 10){
         displaySeconds = "0" + seconds.toString();
@@ -64,7 +62,9 @@ let displayHours = 0;
     else{
         displayHours = hours;
     }
-    document.getElementById("display").innerHTML = displayHours + ":" + displayMinutes + ":" + displaySeconds;
+    document.getElementById("hours").innerHTML = displayHours;
+    document.getElementById("minutes").innerHTML = displayMinutes;
+    document.getElementById("seconds").innerHTML = displaySeconds;
 }
 
 const getTime = function(){
@@ -73,15 +73,19 @@ const getTime = function(){
 }
 
 const setStorage = function(){
-    let startTime = getTime() - timer;
     sessionStorage.setItem('startTime', startTime);
     sessionStorage.setItem('isCounting', isCounting);
     sessionStorage.setItem('timer', timer);
 }
 
+const clearStorage = function(){
+    sessionStorage.clear(); 
+}
+
 function startStop(){
     if(!isCounting){
-        interval = setInterval(countTime, 1000);
+        startTime = getTime() - timer;
+        interval = setInterval(setStopwatch, 1000);
         isCounting = true;
     }
     else{
@@ -97,7 +101,7 @@ function reset(){
     timer = 0;
     isCounting = false;
     setStopwatch(timer);
-    setStorage();
+    clearStorage();
 }
 
 initTimer();
