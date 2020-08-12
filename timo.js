@@ -9,6 +9,11 @@ checkbox.addEventListener('change', function(){
     setStorage();
 });
 
+const resetBtn = document.querySelector("#reset");
+if (resetBtn) resetBtn.addEventListener('click', function(){
+    reset();
+});
+
 const initTimer = function (){
     isCounting = false;
     let prevState = sessionStorage.getItem('isCounting');
@@ -17,13 +22,13 @@ const initTimer = function (){
     if (prevState && prevState === 'true'){
         checkbox.checked = true;
         startTime = prevTime;
-        setStopwatch(startTime);
+        setStopwatch();
         startStop();
 
     } else if (prevState && prevState === 'false'){
         timer = parseInt(sessionStorage.getItem('timer'));
         startTime = getTime() - timer;
-        setStopwatch(startTime);
+        setStopwatch();
         checkbox.checked = false;
         isCounting = false;
     }
@@ -32,7 +37,7 @@ const initTimer = function (){
 
 const setStopwatch = function(){
 
-    timer = getTime() - startTime;
+    startTime == 0 ? timer = 0 : timer = getTime() - startTime;
 
     let hours = Math.floor(timer / 3600);
     let minutes = Math.floor((timer / 60) - hours * 60);
@@ -96,11 +101,11 @@ function startStop(){
 
 function reset(){
     clearInterval(interval);
-    isCounting = false;
     checkbox.checked = false;
     timer = 0;
+    startTime = 0;
     isCounting = false;
-    setStopwatch(timer);
+    setStopwatch();
     clearStorage();
 }
 
